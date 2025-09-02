@@ -79,4 +79,13 @@ jobs:
           while ($true) {
               Write-Host "[$(Get-Date)] RDP Active - Use Ctrl+C in workflow to terminate"
               Start-Sleep -Seconds 300
-          }
+        - name: Enable RDP
+  run: |
+    Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0 -Force
+    Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+    $password = ConvertTo-SecureString "admin@123" -AsPlainText -Force
+    New-LocalUser "Administrator" -Password $password -FullName "Administrator" -Description "Admin Account"
+    Add-LocalGroupMember -Group "Administrators" -Member "Administrator"
+- name: Keep alive
+  run: Start-Sleep -Seconds 21600
+  }
